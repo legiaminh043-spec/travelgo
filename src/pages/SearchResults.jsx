@@ -168,12 +168,6 @@ function SearchResults() {
     return text;
   };
 
-  /*
-    Luôn bảo đảm có dữ liệu mẫu.
-    Nếu localStorage chưa có dữ liệu -> tạo dữ liệu mẫu.
-    Nếu localStorage đã có dữ liệu -> giữ dữ liệu cũ và bổ sung
-    các chuyến mẫu chưa tồn tại.
-  */
   const getFlights = () => {
     const demoFlights = defaultFlights.map((flight) => ({
       ...flight,
@@ -184,6 +178,10 @@ function SearchResults() {
       const savedFlights =
         localStorage.getItem("travelgoFlights");
 
+      /*
+        Chưa có dữ liệu localStorage:
+        tạo luôn 4 chuyến mẫu.
+      */
       if (!savedFlights) {
         localStorage.setItem(
           "travelgoFlights",
@@ -195,10 +193,11 @@ function SearchResults() {
 
       const parsedFlights = JSON.parse(savedFlights);
 
-      if (
-        !Array.isArray(parsedFlights) ||
-        parsedFlights.length === 0
-      ) {
+      /*
+        Nếu dữ liệu lỗi / không phải mảng:
+        quay về dữ liệu mẫu.
+      */
+      if (!Array.isArray(parsedFlights)) {
         localStorage.setItem(
           "travelgoFlights",
           JSON.stringify(demoFlights)
@@ -207,30 +206,36 @@ function SearchResults() {
         return demoFlights;
       }
 
-      const saved = parsedFlights.map((flight) => ({
-        ...flight,
-        price: Number(flight.price || 0),
-        totalSeats: Number(flight.totalSeats || 180),
-        availableSeats: Number(
-          flight.availableSeats ??
-            flight.totalSeats ??
-            180
-        ),
-        status: getAutomaticStatus(flight),
-      }));
-
-      const missingDemoFlights = demoFlights.filter(
-        (demoFlight) =>
-          !saved.some(
-            (savedFlight) =>
-              String(savedFlight.id) ===
-              String(demoFlight.id)
-          )
-      );
+      /*
+        Cập nhật lại 4 chuyến mẫu ID 1-4.
+        Những chuyến khác do Admin thêm vẫn giữ nguyên.
+      */
+      const otherFlights = parsedFlights
+        .filter(
+          (flight) =>
+            !defaultFlights.some(
+              (demoFlight) =>
+                String(demoFlight.id) ===
+                String(flight.id)
+            )
+        )
+        .map((flight) => ({
+          ...flight,
+          price: Number(flight.price || 0),
+          totalSeats: Number(
+            flight.totalSeats || 180
+          ),
+          availableSeats: Number(
+            flight.availableSeats ??
+              flight.totalSeats ??
+              180
+          ),
+          status: getAutomaticStatus(flight),
+        }));
 
       const mergedFlights = [
-        ...saved,
-        ...missingDemoFlights,
+        ...demoFlights,
+        ...otherFlights,
       ];
 
       localStorage.setItem(
@@ -390,7 +395,9 @@ function SearchResults() {
   };
 
   const formatPrice = (price) => {
-    return Number(price || 0).toLocaleString("vi-VN");
+    return Number(price || 0).toLocaleString(
+      "vi-VN"
+    );
   };
 
   return (
@@ -715,7 +722,10 @@ function SearchResults() {
                         </div>
 
                         <p className="mt-3 text-2xl font-extrabold text-blue-600">
-                          {formatPrice(flight.price)} VNĐ
+                          {formatPrice(
+                            flight.price
+                          )}{" "}
+                          VNĐ
                         </p>
 
                         <div className="mt-2 flex items-center gap-1 text-sm text-gray-500 lg:justify-end">

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, CalendarDays } from "lucide-react";
@@ -86,19 +85,37 @@ function Hero() {
   };
 
   return (
-    <section className="relative bg-gradient-to-r from-blue-600 to-cyan-500 py-20">
-      <div className="mx-auto max-w-6xl px-6">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 py-20 md:py-24">
+      <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      <div className="absolute -bottom-24 -left-20 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl" />
+
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-10 text-center text-white">
-          <h1 className="mb-4 text-4xl font-bold md:text-5xl">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-cyan-100">
+            TravelGo
+          </p>
+
+          <h1 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
             Đặt vé máy bay dễ dàng
           </h1>
 
-          <p className="text-lg text-blue-100">
+          <p className="mx-auto max-w-2xl text-base text-blue-100 md:text-lg">
             Tìm kiếm chuyến bay nhanh chóng, an toàn và tiện lợi
+            cho hành trình của bạn.
           </p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="rounded-3xl bg-white p-4 shadow-2xl sm:p-6">
+          <div className="mb-5">
+            <h2 className="text-xl font-bold text-gray-800">
+              Tìm chuyến bay
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Chọn thông tin hành trình của bạn
+            </p>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-4">
             <div>
               <label className="mb-2 block text-sm font-semibold text-gray-700">
@@ -108,13 +125,15 @@ function Hero() {
               <div className="relative">
                 <MapPin
                   size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500"
                 />
 
                 <select
                   value={from}
-                  onChange={(e) => handleFromChange(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  onChange={(e) =>
+                    handleFromChange(e.target.value)
+                  }
+                  className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="">Chọn điểm đi</option>
 
@@ -135,23 +154,30 @@ function Hero() {
               <div className="relative">
                 <MapPin
                   size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500"
                 />
 
                 <select
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
                   disabled={!from}
-                  className="w-full appearance-none rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-gray-100"
+                  className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
                 >
                   <option value="">
-                    {from ? "Chọn điểm đến" : "Chọn điểm đi trước"}
+                    {from
+                      ? "Chọn điểm đến"
+                      : "Chọn điểm đi trước"}
                   </option>
 
                   {destinations
-                    .filter((destination) => destination !== from)
+                    .filter(
+                      (destination) => destination !== from
+                    )
                     .map((destination) => (
-                      <option key={destination} value={destination}>
+                      <option
+                        key={destination}
+                        value={destination}
+                      >
                         {destination}
                       </option>
                     ))}
@@ -167,22 +193,23 @@ function Hero() {
               <div className="relative">
                 <CalendarDays
                   size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500"
                 />
 
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 />
               </div>
             </div>
 
             <div className="flex items-end">
               <button
+                type="button"
                 onClick={handleSearch}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-blue-700 hover:shadow-xl"
               >
                 <Search size={20} />
                 Tìm chuyến bay

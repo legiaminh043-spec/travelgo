@@ -21,50 +21,58 @@ const destinations = [
 
 function Destinations() {
   return (
-    <section id="destinations" className="py-20">
-      <div className="mx-auto max-w-7xl px-6">
-
+    <section
+      id="destinations"
+      className="bg-white py-20"
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-12 text-center">
-          <p className="font-semibold text-blue-600">
+          <p className="text-sm font-bold uppercase tracking-widest text-blue-600">
             ĐIỂM ĐẾN
           </p>
 
-          <h2 className="mt-3 text-3xl font-bold">
+          <h2 className="mt-3 text-3xl font-extrabold text-gray-900 md:text-4xl">
             Điểm đến phổ biến
           </h2>
 
-          <p className="mt-4 text-gray-600">
-            Khám phá những địa điểm hấp dẫn tại Việt Nam.
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+            Khám phá những địa điểm hấp dẫn và trải nghiệm
+            tuyệt vời tại Việt Nam.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-
           {destinations.map((destination) => (
             <div
               key={destination.name}
-              className="group relative h-80 overflow-hidden rounded-2xl"
+              className="group relative h-80 overflow-hidden rounded-2xl shadow-md"
             >
               <img
                 src={destination.image}
                 alt={destination.name}
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-              <div className="absolute bottom-6 left-6 text-white">
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                 <h3 className="text-2xl font-bold">
                   {destination.name}
                 </h3>
 
-                <p className="mt-2">
+                <p className="mt-2 text-sm text-gray-200">
                   {destination.description}
                 </p>
+
+                <button
+                  type="button"
+                  className="mt-4 rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition hover:bg-white hover:text-blue-600"
+                >
+                  Khám phá →
+                </button>
               </div>
             </div>
           ))}
-
         </div>
       </div>
     </section>

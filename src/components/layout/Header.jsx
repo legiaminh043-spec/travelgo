@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Plane,
   Menu,
   Bell,
   Globe,
@@ -78,9 +77,11 @@ function Header() {
           onClick={closeMobileMenu}
           className="flex items-center gap-2"
         >
-          <div className="rounded-xl bg-blue-600 p-2 text-white">
-            <Plane size={22} />
-          </div>
+          <img
+            src="/travelgo-logo.png"
+            alt="TravelGo"
+            className="h-10 w-10 rounded-xl object-cover"
+          />
 
           <span className="text-lg font-bold text-blue-600 sm:text-xl">
             TravelGo

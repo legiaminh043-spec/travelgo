@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Plane,
   Menu,
   Bell,
   Globe,
   X,
 } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
+import travelgoLogo from "../../assets/travelgo-logo.png";
 
 function Header() {
   const navigate = useNavigate();
@@ -73,20 +73,24 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:py-4">
+        {/* Logo */}
         <Link
           to="/"
           onClick={closeMobileMenu}
-          className="flex items-center gap-2"
+          className="flex items-center gap-3"
         >
-          <div className="rounded-xl bg-blue-600 p-2 text-white">
-            <Plane size={22} />
-          </div>
+          <img
+            src={travelgoLogo}
+            alt="TravelGo"
+            className="h-10 w-10 rounded-xl object-cover"
+          />
 
           <span className="text-lg font-bold text-blue-600 sm:text-xl">
             TravelGo
           </span>
         </Link>
 
+        {/* Desktop navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           <Link
             to="/"
@@ -135,7 +139,9 @@ function Header() {
           </Link>
         </nav>
 
+        {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Language */}
           <div className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1.5">
             <Globe
               size={17}
@@ -152,6 +158,7 @@ function Header() {
             </select>
           </div>
 
+          {/* Notifications */}
           {isLoggedIn && (
             <button
               type="button"
@@ -162,14 +169,13 @@ function Header() {
 
               {unreadCount > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                  {unreadCount > 9
-                    ? "9+"
-                    : unreadCount}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </button>
           )}
 
+          {/* User */}
           {isLoggedIn && user ? (
             <div className="hidden items-center gap-3 md:flex">
               <div className="text-right">
@@ -210,6 +216,7 @@ function Header() {
             </div>
           )}
 
+          {/* Mobile button */}
           <button
             type="button"
             onClick={() =>
@@ -226,6 +233,7 @@ function Header() {
         </div>
       </div>
 
+      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="border-t bg-white md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4 sm:px-6">

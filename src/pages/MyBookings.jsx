@@ -16,6 +16,25 @@ import {
   Star,
 } from "lucide-react";
 
+function parseBookingDate(value) {
+  if (!value) return 0;
+
+  const text = String(value).trim();
+
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(text)) {
+    const [day, month, year] = text.split("/");
+    const parsed = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+    return parsed.getTime();
+  }
+
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+}
+
 function MyBookings() {
   const navigate = useNavigate();
 
@@ -137,6 +156,10 @@ function MyBookings() {
       return;
     }
 
+    const targetBooking = bookings.find(
+      (booking) => booking.id === id
+    );
+
     const updatedBookings = bookings.map((booking) =>
       booking.id === id
         ? {
@@ -152,6 +175,55 @@ function MyBookings() {
       "travelgoBookings",
       JSON.stringify(updatedBookings)
     );
+
+    // Return one seat to the flight inventory when a paid booking is canceled.
+    if (targetBooking?.flightId) {
+      try {
+        const savedFlights = localStorage.getItem(
+          "travelgoFlights"
+        );
+
+        if (savedFlights) {
+          const flights = JSON.parse(savedFlights);
+
+          if (Array.isArray(flights)) {
+            const restoredFlights = flights.map((flight) => {
+              if (
+                String(flight.id) ===
+                String(targetBooking.flightId)
+              ) {
+                const totalSeats = Number(
+                  flight.totalSeats || 180
+                );
+                const currentAvailable = Number(
+                  flight.availableSeats ?? totalSeats
+                );
+
+                return {
+                  ...flight,
+                  availableSeats: Math.min(
+                    currentAvailable + 1,
+                    totalSeats
+                  ),
+                };
+              }
+
+              return flight;
+            });
+
+            localStorage.setItem(
+              "travelgoFlights",
+              JSON.stringify(restoredFlights)
+            );
+          }
+        }
+      } catch (error) {
+        console.error(
+          "Lỗi hoàn lại ghế sau khi hủy vé:",
+          error
+        );
+      }
+    }
 
     if (selectedBooking?.id === id) {
       setSelectedBooking({

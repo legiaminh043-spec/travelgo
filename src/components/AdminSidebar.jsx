@@ -9,6 +9,7 @@ import {
   Tag,
   Home,
   LogOut,
+  MessageSquare
 } from "lucide-react";
 
 function AdminSidebar() {
@@ -50,6 +51,11 @@ function AdminSidebar() {
       label: "Mã giảm giá",
       icon: Tag,
     },
+    {
+      label: "Đánh giá",
+      path: "/admin/reviews",
+      icon: MessageSquare,
+    }
   ];
 
   return (

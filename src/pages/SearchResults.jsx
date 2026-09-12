@@ -1,6 +1,14 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { MapPin, Calendar, Plane, Filter } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  MapPin,
+  Calendar,
+  Plane,
+  Filter,
+  Clock,
+  Armchair,
+  ArrowRight,
+} from "lucide-react";
 
 function getAutomaticStatus(flight) {
   if (flight.status === "Đã hủy") {
@@ -78,7 +86,7 @@ function SearchResults() {
       flightCode: "VN123",
       from: "Hà Nội",
       to: "TP. Hồ Chí Minh",
-      date: "10/09/2026",
+      date: "20/09/2026",
       time: "08:00",
       price: 1200000,
       totalSeats: 180,
@@ -91,7 +99,7 @@ function SearchResults() {
       flightCode: "VJ456",
       from: "Hà Nội",
       to: "Đà Nẵng",
-      date: "11/09/2026",
+      date: "21/09/2026",
       time: "10:30",
       price: 850000,
       totalSeats: 180,
@@ -104,12 +112,12 @@ function SearchResults() {
       flightCode: "QH789",
       from: "TP. Hồ Chí Minh",
       to: "Hà Nội",
-      date: "12/09/2026",
+      date: "22/09/2026",
       time: "14:00",
       price: 1350000,
       totalSeats: 180,
       availableSeats: 180,
-      status: "Sắp bay",
+      status: "Đang mở bán",
     },
     {
       id: 4,
@@ -117,7 +125,7 @@ function SearchResults() {
       flightCode: "VN555",
       from: "Đà Nẵng",
       to: "Hà Nội",
-      date: "13/09/2026",
+      date: "23/09/2026",
       time: "16:30",
       price: 1050000,
       totalSeats: 180,
@@ -162,18 +170,24 @@ function SearchResults() {
 
   const getFlights = () => {
     try {
-      const savedFlights = localStorage.getItem("travelgoFlights");
+      const savedFlights =
+        localStorage.getItem("travelgoFlights");
 
       if (savedFlights) {
         const parsedFlights = JSON.parse(savedFlights);
 
-        if (Array.isArray(parsedFlights) && parsedFlights.length > 0) {
+        if (
+          Array.isArray(parsedFlights) &&
+          parsedFlights.length > 0
+        ) {
           const updatedFlights = parsedFlights.map((flight) => ({
             ...flight,
             price: Number(flight.price || 0),
             totalSeats: Number(flight.totalSeats || 180),
             availableSeats: Number(
-              flight.availableSeats ?? flight.totalSeats ?? 180
+              flight.availableSeats ??
+                flight.totalSeats ??
+                180
             ),
             status: getAutomaticStatus(flight),
           }));
@@ -187,7 +201,10 @@ function SearchResults() {
         }
       }
     } catch (error) {
-      console.error("Lỗi đọc travelgoFlights:", error);
+      console.error(
+        "Lỗi đọc travelgoFlights:",
+        error
+      );
     }
 
     return defaultFlights.map((flight) => ({
@@ -202,73 +219,86 @@ function SearchResults() {
   const normalizedTo = normalizeText(to);
   const normalizedSearchDate = normalizeDate(date);
 
-  const filteredFlights = flights
-    .filter((flight) => {
-      const flightFrom = normalizeText(flight.from);
-      const flightTo = normalizeText(flight.to);
-      const flightDate = normalizeDate(flight.date);
+  const filteredFlights = useMemo(() => {
+    return flights
+      .filter((flight) => {
+        const flightFrom = normalizeText(flight.from);
+        const flightTo = normalizeText(flight.to);
+        const flightDate = normalizeDate(flight.date);
 
-      const matchFrom =
-        !normalizedFrom ||
-        flightFrom.includes(normalizedFrom) ||
-        normalizedFrom.includes(flightFrom);
+        const matchFrom =
+          !normalizedFrom ||
+          flightFrom.includes(normalizedFrom) ||
+          normalizedFrom.includes(flightFrom);
 
-      const matchTo =
-        !normalizedTo ||
-        flightTo.includes(normalizedTo) ||
-        normalizedTo.includes(flightTo);
+        const matchTo =
+          !normalizedTo ||
+          flightTo.includes(normalizedTo) ||
+          normalizedTo.includes(flightTo);
 
-      const matchDate =
-        !normalizedSearchDate ||
-        flightDate === normalizedSearchDate;
+        const matchDate =
+          !normalizedSearchDate ||
+          flightDate === normalizedSearchDate;
 
-      const matchAirline =
-        airlineFilter === "all" ||
-        flight.airline === airlineFilter;
+        const matchAirline =
+          airlineFilter === "all" ||
+          flight.airline === airlineFilter;
 
-      const matchStatus =
-        statusFilter === "all" ||
-        flight.status === statusFilter;
+        const matchStatus =
+          statusFilter === "all" ||
+          flight.status === statusFilter;
 
-      let matchPrice = true;
+        let matchPrice = true;
 
-      if (priceFilter === "under1") {
-        matchPrice = flight.price < 1000000;
-      }
+        if (priceFilter === "under1") {
+          matchPrice = flight.price < 1000000;
+        }
 
-      if (priceFilter === "1to2") {
-        matchPrice =
-          flight.price >= 1000000 &&
-          flight.price <= 2000000;
-      }
+        if (priceFilter === "1to2") {
+          matchPrice =
+            flight.price >= 1000000 &&
+            flight.price <= 2000000;
+        }
 
-      if (priceFilter === "over2") {
-        matchPrice = flight.price > 2000000;
-      }
+        if (priceFilter === "over2") {
+          matchPrice = flight.price > 2000000;
+        }
 
-      return (
-        matchFrom &&
-        matchTo &&
-        matchDate &&
-        matchAirline &&
-        matchStatus &&
-        matchPrice
-      );
-    })
-    .sort((a, b) => {
-      if (sortOrder === "lowToHigh") {
-        return a.price - b.price;
-      }
+        return (
+          matchFrom &&
+          matchTo &&
+          matchDate &&
+          matchAirline &&
+          matchStatus &&
+          matchPrice
+        );
+      })
+      .sort((a, b) => {
+        if (sortOrder === "lowToHigh") {
+          return a.price - b.price;
+        }
 
-      if (sortOrder === "highToLow") {
-        return b.price - a.price;
-      }
+        if (sortOrder === "highToLow") {
+          return b.price - a.price;
+        }
 
-      return 0;
-    });
+        return 0;
+      });
+  }, [
+    flights,
+    normalizedFrom,
+    normalizedTo,
+    normalizedSearchDate,
+    airlineFilter,
+    priceFilter,
+    statusFilter,
+    sortOrder,
+  ]);
 
   const airlines = [
-    ...new Set(flights.map((flight) => flight.airline)),
+    ...new Set(
+      flights.map((flight) => flight.airline)
+    ),
   ];
 
   const statuses = [
@@ -317,15 +347,31 @@ function SearchResults() {
         flight.to
       )}&date=${encodeURIComponent(
         flight.date
-      )}&price=${encodeURIComponent(flight.price)}`
+      )}&price=${encodeURIComponent(
+        flight.price
+      )}`
+    );
+  };
+
+  const formatPrice = (price) => {
+    return Number(price || 0).toLocaleString(
+      "vi-VN"
     );
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-blue-600 py-12 text-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <h1 className="text-3xl font-bold">
+      {/* Hero */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 py-12 text-white">
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <p className="text-sm font-bold uppercase tracking-widest text-blue-100">
+            TRAVELGO
+          </p>
+
+          <h1 className="mt-2 text-3xl font-extrabold md:text-4xl">
             Kết quả tìm kiếm
           </h1>
 
@@ -335,63 +381,86 @@ function SearchResults() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
-        <div className="grid gap-5 md:grid-cols-3">
-          <div className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm">
-            <MapPin className="text-blue-600" />
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        {/* Summary */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <MapPin size={20} />
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">
-                Hành trình
-              </p>
+              <div>
+                <p className="text-sm text-gray-500">
+                  Hành trình
+                </p>
 
-              <p className="font-bold">
-                {from || "Chưa chọn"} → {to || "Chưa chọn"}
-              </p>
+                <p className="font-bold text-gray-900">
+                  {from || "Chưa chọn"} →{" "}
+                  {to || "Chưa chọn"}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm">
-            <Calendar className="text-blue-600" />
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <Calendar size={20} />
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">
-                Ngày đi
-              </p>
+              <div>
+                <p className="text-sm text-gray-500">
+                  Ngày đi
+                </p>
 
-              <p className="font-bold">
-                {date || "Chưa chọn"}
-              </p>
+                <p className="font-bold text-gray-900">
+                  {date || "Chưa chọn"}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-white p-5 shadow-sm">
-            <Plane className="text-blue-600" />
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <Plane size={20} />
+              </div>
 
-            <div>
-              <p className="text-sm text-gray-500">
-                Dịch vụ
-              </p>
+              <div>
+                <p className="text-sm text-gray-500">
+                  Kết quả
+                </p>
 
-              <p className="font-bold">
-                Chuyến bay
-              </p>
+                <p className="font-bold text-gray-900">
+                  {filteredFlights.length} chuyến bay
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center gap-2">
-            <Filter className="text-blue-600" />
+        {/* Filters */}
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Filter size={19} />
+            </div>
 
-            <h2 className="text-xl font-bold">
-              Lọc chuyến bay
-            </h2>
+            <div>
+              <h2 className="font-bold text-gray-900">
+                Lọc chuyến bay
+              </h2>
+
+              <p className="text-sm text-gray-500">
+                Điều chỉnh kết quả theo nhu cầu
+              </p>
+            </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-4">
             <div>
-              <label className="mb-2 block font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Hãng bay
               </label>
 
@@ -400,14 +469,17 @@ function SearchResults() {
                 onChange={(e) =>
                   setAirlineFilter(e.target.value)
                 }
-                className="w-full rounded-lg border px-4 py-3 outline-none"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">
                   Tất cả hãng bay
                 </option>
 
                 {airlines.map((airline) => (
-                  <option key={airline} value={airline}>
+                  <option
+                    key={airline}
+                    value={airline}
+                  >
                     {airline}
                   </option>
                 ))}
@@ -415,7 +487,7 @@ function SearchResults() {
             </div>
 
             <div>
-              <label className="mb-2 block font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Trạng thái
               </label>
 
@@ -424,14 +496,17 @@ function SearchResults() {
                 onChange={(e) =>
                   setStatusFilter(e.target.value)
                 }
-                className="w-full rounded-lg border px-4 py-3 outline-none"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">
                   Tất cả trạng thái
                 </option>
 
                 {statuses.map((status) => (
-                  <option key={status} value={status}>
+                  <option
+                    key={status}
+                    value={status}
+                  >
                     {status}
                   </option>
                 ))}
@@ -439,7 +514,7 @@ function SearchResults() {
             </div>
 
             <div>
-              <label className="mb-2 block font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Khoảng giá
               </label>
 
@@ -448,7 +523,7 @@ function SearchResults() {
                 onChange={(e) =>
                   setPriceFilter(e.target.value)
                 }
-                className="w-full rounded-lg border px-4 py-3 outline-none"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">
                   Tất cả mức giá
@@ -469,7 +544,7 @@ function SearchResults() {
             </div>
 
             <div>
-              <label className="mb-2 block font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Sắp xếp
               </label>
 
@@ -478,7 +553,7 @@ function SearchResults() {
                 onChange={(e) =>
                   setSortOrder(e.target.value)
                 }
-                className="w-full rounded-lg border px-4 py-3 outline-none"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
               >
                 <option value="default">
                   Mặc định
@@ -496,101 +571,203 @@ function SearchResults() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-bold">
-            Chuyến bay
-          </h2>
+        {/* Results */}
+        <div className="mt-8">
+          <div className="mb-5">
+            <h2 className="text-2xl font-extrabold text-gray-900">
+              Chuyến bay
+            </h2>
 
-          <p className="mt-2 text-gray-500">
-            Tìm thấy {filteredFlights.length} chuyến bay
-          </p>
+            <p className="mt-1 text-sm text-gray-500">
+              Tìm thấy{" "}
+              <span className="font-semibold text-blue-600">
+                {filteredFlights.length}
+              </span>{" "}
+              chuyến bay phù hợp
+            </p>
+          </div>
 
-          {filteredFlights.map((flight) => {
-            const availableSeats = Number(
-              flight.availableSeats || 0
-            );
+          <div className="space-y-5">
+            {filteredFlights.map((flight) => {
+              const availableSeats = Number(
+                flight.availableSeats || 0
+              );
 
-            const disabled =
-              availableSeats <= 0 ||
-              flight.status === "Đã hủy" ||
-              flight.status === "Đã bay";
+              const disabled =
+                availableSeats <= 0 ||
+                flight.status === "Đã hủy" ||
+                flight.status === "Đã bay";
 
-            return (
-              <div
-                key={flight.id || flight.flightCode}
-                className="mt-6 rounded-xl border p-6"
-              >
-                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <p className="text-lg font-bold">
-                        {flight.airline}
-                      </p>
+              return (
+                <div
+                  key={
+                    flight.id ||
+                    flight.flightCode
+                  }
+                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="p-5 sm:p-6">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                      {/* Airline */}
+                      <div className="min-w-0 lg:w-60">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <Plane size={22} />
+                          </div>
 
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClass(
-                          flight.status
-                        )}`}
-                      >
-                        {flight.status}
-                      </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-lg font-bold text-gray-900">
+                              {flight.airline}
+                            </p>
+
+                            <p className="mt-0.5 text-sm font-semibold text-blue-600">
+                              {flight.flightCode}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Route */}
+                      <div className="flex flex-1 items-center justify-center gap-4">
+                        <div className="text-center">
+                          <p className="text-2xl font-extrabold text-gray-900">
+                            {flight.time}
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium text-gray-600">
+                            {flight.from}
+                          </p>
+                        </div>
+
+                        <div className="hidden flex-col items-center sm:flex">
+                          <div className="flex items-center gap-2">
+                            <span className="h-px w-10 bg-gray-200" />
+
+                            <Plane
+                              size={18}
+                              className="rotate-90 text-blue-500"
+                            />
+
+                            <span className="h-px w-10 bg-gray-200" />
+                          </div>
+
+                          <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
+                            <Clock size={13} />
+                            Bay thẳng
+                          </div>
+                        </div>
+
+                        <ArrowRight
+                          size={18}
+                          className="text-gray-300 sm:hidden"
+                        />
+
+                        <div className="text-center">
+                          <p className="text-2xl font-extrabold text-gray-900">
+                            —
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium text-gray-600">
+                            {flight.to}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="lg:w-60 lg:text-right">
+                        <div className="flex items-center gap-2 lg:justify-end">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusClass(
+                              flight.status
+                            )}`}
+                          >
+                            {flight.status}
+                          </span>
+                        </div>
+
+                        <p className="mt-3 text-2xl font-extrabold text-blue-600">
+                          {formatPrice(
+                            flight.price
+                          )}{" "}
+                          VNĐ
+                        </p>
+
+                        <div className="mt-2 flex items-center gap-1 text-sm text-gray-500 lg:justify-end">
+                          <Armchair size={15} />
+                          Còn {availableSeats} ghế
+                        </div>
+
+                        <button
+                          type="button"
+                          disabled={disabled}
+                          onClick={() =>
+                            handleBooking(flight)
+                          }
+                          className={`mt-4 w-full rounded-xl px-5 py-3 font-bold transition lg:w-auto ${
+                            disabled
+                              ? "cursor-not-allowed bg-gray-200 text-gray-400"
+                              : "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
+                          }`}
+                        >
+                          {flight.status ===
+                          "Đã hủy"
+                            ? "Đã hủy"
+                            : flight.status ===
+                              "Đã bay"
+                            ? "Đã bay"
+                            : availableSeats <=
+                              0
+                            ? "Hết chỗ"
+                            : "Đặt ngay"}
+                        </button>
+                      </div>
                     </div>
 
-                    <p className="mt-1 text-sm font-medium text-blue-600">
-                      {flight.flightCode}
-                    </p>
+                    <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-gray-100 pt-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <Calendar
+                          size={15}
+                          className="text-blue-500"
+                        />
+                        {flight.date}
+                      </div>
 
-                    <p className="mt-2 text-gray-500">
-                      {flight.from} → {flight.to}
-                    </p>
+                      <div className="flex items-center gap-2">
+                        <Clock
+                          size={15}
+                          className="text-blue-500"
+                        />
+                        Khởi hành {flight.time}
+                      </div>
 
-                    <p className="mt-1 text-sm text-gray-400">
-                      {flight.date} • {flight.time}
-                    </p>
-
-                    <p className="mt-2 text-sm text-gray-500">
-                      Ghế còn lại: {availableSeats}
-                    </p>
-                  </div>
-
-                  <div className="text-left md:text-right">
-                    <p className="text-xl font-bold text-blue-600">
-                      {Number(
-                        flight.price || 0
-                      ).toLocaleString("vi-VN")}{" "}
-                      VNĐ
-                    </p>
-
-                    <button
-                      type="button"
-                      disabled={disabled}
-                      onClick={() => handleBooking(flight)}
-                      className={`mt-3 rounded-lg px-5 py-2 font-semibold text-white ${
-                        disabled
-                          ? "cursor-not-allowed bg-gray-400"
-                          : "bg-blue-600 hover:bg-blue-700"
-                      }`}
-                    >
-                      {flight.status === "Đã hủy"
-                        ? "Đã hủy"
-                        : flight.status === "Đã bay"
-                        ? "Đã bay"
-                        : availableSeats <= 0
-                        ? "Hết chỗ"
-                        : "Đặt ngay"}
-                    </button>
+                      <div className="flex items-center gap-2">
+                        <Armchair
+                          size={15}
+                          className="text-blue-500"
+                        />
+                        {availableSeats}/
+                        {flight.totalSeats} ghế
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
 
           {filteredFlights.length === 0 && (
-            <div className="mt-6 rounded-xl border border-dashed p-10 text-center">
-              <Plane className="mx-auto mb-3 text-gray-400" />
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                <Plane size={30} />
+              </div>
 
-              <p className="font-semibold text-gray-600">
+              <h3 className="mt-5 text-lg font-bold text-gray-800">
                 Không tìm thấy chuyến bay phù hợp
+              </h3>
+
+              <p className="mt-2 text-sm text-gray-500">
+                Hãy thử thay đổi bộ lọc hoặc thông tin
+                tìm kiếm.
               </p>
             </div>
           )}
@@ -598,7 +775,7 @@ function SearchResults() {
 
         <Link
           to="/"
-          className="mt-8 inline-block rounded-lg border border-blue-600 px-5 py-3 font-semibold text-blue-600"
+          className="mt-8 inline-flex items-center rounded-xl border border-blue-600 px-5 py-3 font-semibold text-blue-600 transition hover:bg-blue-50"
         >
           ← Quay lại trang chủ
         </Link>

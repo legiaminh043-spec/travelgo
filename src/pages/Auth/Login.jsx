@@ -1,46 +1,72 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, Eye } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    const savedUser = localStorage.getItem("travelgoUser");
-
-    if (!savedUser) {
-      alert("Chưa có tài khoản. Vui lòng đăng ký!");
-      return;
-    }
-
-    let user;
+    const normalizedEmail = email.trim().toLowerCase();
 
     try {
-      user = JSON.parse(savedUser);
-    } catch (error) {
-      localStorage.removeItem("travelgoUser");
-      alert("Dữ liệu tài khoản bị lỗi. Vui lòng đăng ký lại!");
-      return;
-    }
+      const savedUsers = localStorage.getItem("travelgoUsers");
+      const users = savedUsers ? JSON.parse(savedUsers) : [];
 
-    if (email.trim() === user.email && password === user.password) {
-      localStorage.setItem("travelgoLoggedIn", "true");
+      if (Array.isArray(users)) {
+        const user = users.find(
+          (item) =>
+            String(item.email || "").trim().toLowerCase() ===
+              normalizedEmail &&
+            String(item.password || "") === password
+        );
 
-      alert("Đăng nhập thành công!");
+        if (user) {
+          localStorage.setItem(
+            "travelgoUser",
+            JSON.stringify(user)
+          );
+          localStorage.setItem("travelgoLoggedIn", "true");
 
-      if (user.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/", { replace: true });
+          navigate(user.role === "admin" ? "/admin" : "/", {
+            replace: true,
+          });
+          return;
+        }
       }
-    } else {
-      alert("Email hoặc mật khẩu không đúng!");
+    } catch (error) {
+      console.error("Lỗi đọc danh sách tài khoản:", error);
     }
+
+    // Backward compatibility with older data that only stored one user.
+    const savedUser = localStorage.getItem("travelgoUser");
+
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+
+        if (
+          String(user.email || "").trim().toLowerCase() ===
+            normalizedEmail &&
+          String(user.password || "") === password
+        ) {
+          localStorage.setItem("travelgoLoggedIn", "true");
+          navigate(user.role === "admin" ? "/admin" : "/", {
+            replace: true,
+          });
+          return;
+        }
+      } catch (error) {
+        localStorage.removeItem("travelgoUser");
+      }
+    }
+
+    alert("Email hoặc mật khẩu không đúng!");
   };
 
   return (
@@ -71,6 +97,7 @@ function Login() {
 
               <input
                 type="email"
+                required
                 placeholder="Nhập email của bạn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -88,29 +115,27 @@ function Login() {
               <Lock size={20} className="text-gray-400" />
 
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
+                required
                 placeholder="Nhập mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-3 outline-none"
               />
 
-              <Eye size={20} className="text-gray-400" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
             </div>
-          </div>
-
-          <div className="mb-6 flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Ghi nhớ tôi
-            </label>
-
-            <button
-              type="button"
-              className="text-blue-600 hover:underline"
-            >
-              Quên mật khẩu?
-            </button>
           </div>
 
           <button

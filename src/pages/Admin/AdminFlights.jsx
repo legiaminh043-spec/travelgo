@@ -753,7 +753,7 @@ function AdminFlights() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-semibold">
+                  <label className="mb-2 block font-semibolsdd">
                     Trạng thái
                   </label>
 

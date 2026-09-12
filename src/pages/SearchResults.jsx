@@ -64,6 +64,61 @@ function getAutomaticStatus(flight) {
   return "Đang mở bán";
 }
 
+const defaultFlights = [
+  {
+    id: 1,
+    airline: "Vietnam Airlines",
+    flightCode: "VN123",
+    from: "Hà Nội",
+    to: "TP. Hồ Chí Minh",
+    date: "20/09/2026",
+    time: "08:00",
+    price: 1200000,
+    totalSeats: 180,
+    availableSeats: 180,
+    status: "Đang mở bán",
+  },
+  {
+    id: 2,
+    airline: "Vietjet Air",
+    flightCode: "VJ456",
+    from: "Hà Nội",
+    to: "Đà Nẵng",
+    date: "21/09/2026",
+    time: "10:30",
+    price: 850000,
+    totalSeats: 180,
+    availableSeats: 180,
+    status: "Đang mở bán",
+  },
+  {
+    id: 3,
+    airline: "Bamboo Airways",
+    flightCode: "QH789",
+    from: "TP. Hồ Chí Minh",
+    to: "Hà Nội",
+    date: "22/09/2026",
+    time: "14:00",
+    price: 1350000,
+    totalSeats: 180,
+    availableSeats: 180,
+    status: "Đang mở bán",
+  },
+  {
+    id: 4,
+    airline: "Vietnam Airlines",
+    flightCode: "VN555",
+    from: "Đà Nẵng",
+    to: "Hà Nội",
+    date: "23/09/2026",
+    time: "16:30",
+    price: 1050000,
+    totalSeats: 180,
+    availableSeats: 180,
+    status: "Đang mở bán",
+  },
+];
+
 function SearchResults() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,61 +133,6 @@ function SearchResults() {
   const [priceFilter, setPriceFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("default");
-
-  const defaultFlights = [
-    {
-      id: 1,
-      airline: "Vietnam Airlines",
-      flightCode: "VN123",
-      from: "Hà Nội",
-      to: "TP. Hồ Chí Minh",
-      date: "20/09/2026",
-      time: "08:00",
-      price: 1200000,
-      totalSeats: 180,
-      availableSeats: 180,
-      status: "Đang mở bán",
-    },
-    {
-      id: 2,
-      airline: "Vietjet Air",
-      flightCode: "VJ456",
-      from: "Hà Nội",
-      to: "Đà Nẵng",
-      date: "21/09/2026",
-      time: "10:30",
-      price: 850000,
-      totalSeats: 180,
-      availableSeats: 180,
-      status: "Đang mở bán",
-    },
-    {
-      id: 3,
-      airline: "Bamboo Airways",
-      flightCode: "QH789",
-      from: "TP. Hồ Chí Minh",
-      to: "Hà Nội",
-      date: "22/09/2026",
-      time: "14:00",
-      price: 1350000,
-      totalSeats: 180,
-      availableSeats: 180,
-      status: "Đang mở bán",
-    },
-    {
-      id: 4,
-      airline: "Vietnam Airlines",
-      flightCode: "VN555",
-      from: "Đà Nẵng",
-      to: "Hà Nội",
-      date: "23/09/2026",
-      time: "16:30",
-      price: 1050000,
-      totalSeats: 180,
-      availableSeats: 180,
-      status: "Đang mở bán",
-    },
-  ];
 
   const normalizeText = (value) => {
     return String(value || "")
@@ -168,49 +168,85 @@ function SearchResults() {
     return text;
   };
 
+  /*
+    Luôn bảo đảm có dữ liệu mẫu.
+    Nếu localStorage chưa có dữ liệu -> tạo dữ liệu mẫu.
+    Nếu localStorage đã có dữ liệu -> giữ dữ liệu cũ và bổ sung
+    các chuyến mẫu chưa tồn tại.
+  */
   const getFlights = () => {
+    const demoFlights = defaultFlights.map((flight) => ({
+      ...flight,
+      status: getAutomaticStatus(flight),
+    }));
+
     try {
       const savedFlights =
         localStorage.getItem("travelgoFlights");
 
-      if (savedFlights) {
-        const parsedFlights = JSON.parse(savedFlights);
+      if (!savedFlights) {
+        localStorage.setItem(
+          "travelgoFlights",
+          JSON.stringify(demoFlights)
+        );
 
-        if (
-          Array.isArray(parsedFlights) &&
-          parsedFlights.length > 0
-        ) {
-          const updatedFlights = parsedFlights.map((flight) => ({
-            ...flight,
-            price: Number(flight.price || 0),
-            totalSeats: Number(flight.totalSeats || 180),
-            availableSeats: Number(
-              flight.availableSeats ??
-                flight.totalSeats ??
-                180
-            ),
-            status: getAutomaticStatus(flight),
-          }));
-
-          localStorage.setItem(
-            "travelgoFlights",
-            JSON.stringify(updatedFlights)
-          );
-
-          return updatedFlights;
-        }
+        return demoFlights;
       }
+
+      const parsedFlights = JSON.parse(savedFlights);
+
+      if (
+        !Array.isArray(parsedFlights) ||
+        parsedFlights.length === 0
+      ) {
+        localStorage.setItem(
+          "travelgoFlights",
+          JSON.stringify(demoFlights)
+        );
+
+        return demoFlights;
+      }
+
+      const saved = parsedFlights.map((flight) => ({
+        ...flight,
+        price: Number(flight.price || 0),
+        totalSeats: Number(flight.totalSeats || 180),
+        availableSeats: Number(
+          flight.availableSeats ??
+            flight.totalSeats ??
+            180
+        ),
+        status: getAutomaticStatus(flight),
+      }));
+
+      const missingDemoFlights = demoFlights.filter(
+        (demoFlight) =>
+          !saved.some(
+            (savedFlight) =>
+              String(savedFlight.id) ===
+              String(demoFlight.id)
+          )
+      );
+
+      const mergedFlights = [
+        ...saved,
+        ...missingDemoFlights,
+      ];
+
+      localStorage.setItem(
+        "travelgoFlights",
+        JSON.stringify(mergedFlights)
+      );
+
+      return mergedFlights;
     } catch (error) {
       console.error(
         "Lỗi đọc travelgoFlights:",
         error
       );
-    }
 
-    return defaultFlights.map((flight) => ({
-      ...flight,
-      status: getAutomaticStatus(flight),
-    }));
+      return demoFlights;
+    }
   };
 
   const flights = getFlights();
@@ -354,9 +390,7 @@ function SearchResults() {
   };
 
   const formatPrice = (price) => {
-    return Number(price || 0).toLocaleString(
-      "vi-VN"
-    );
+    return Number(price || 0).toLocaleString("vi-VN");
   };
 
   return (
@@ -364,6 +398,7 @@ function SearchResults() {
       {/* Hero */}
       <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 py-12 text-white">
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+
         <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
@@ -476,10 +511,7 @@ function SearchResults() {
                 </option>
 
                 {airlines.map((airline) => (
-                  <option
-                    key={airline}
-                    value={airline}
-                  >
+                  <option key={airline} value={airline}>
                     {airline}
                   </option>
                 ))}
@@ -503,10 +535,7 @@ function SearchResults() {
                 </option>
 
                 {statuses.map((status) => (
-                  <option
-                    key={status}
-                    value={status}
-                  >
+                  <option key={status} value={status}>
                     {status}
                   </option>
                 ))}
@@ -686,10 +715,7 @@ function SearchResults() {
                         </div>
 
                         <p className="mt-3 text-2xl font-extrabold text-blue-600">
-                          {formatPrice(
-                            flight.price
-                          )}{" "}
-                          VNĐ
+                          {formatPrice(flight.price)} VNĐ
                         </p>
 
                         <div className="mt-2 flex items-center gap-1 text-sm text-gray-500 lg:justify-end">
@@ -709,14 +735,12 @@ function SearchResults() {
                               : "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:shadow-lg"
                           }`}
                         >
-                          {flight.status ===
-                          "Đã hủy"
+                          {flight.status === "Đã hủy"
                             ? "Đã hủy"
                             : flight.status ===
                               "Đã bay"
                             ? "Đã bay"
-                            : availableSeats <=
-                              0
+                            : availableSeats <= 0
                             ? "Hết chỗ"
                             : "Đặt ngay"}
                         </button>

@@ -15,29 +15,6 @@ import {
 function Notifications() {
   const navigate = useNavigate();
 
-  const [notifications, setNotifications] = useState(() => {
-    try {
-      const saved = localStorage.getItem(
-        "travelgoNotifications"
-      );
-
-      if (!saved) {
-        return [];
-      }
-
-      const parsed = JSON.parse(saved);
-
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      console.error(
-        "Không thể đọc thông báo:",
-        error
-      );
-
-      return [];
-    }
-  });
-
   const currentUser = (() => {
     try {
       const savedUser = localStorage.getItem("travelgoUser");
@@ -48,54 +25,106 @@ function Notifications() {
     }
   })();
 
-  const currentUserEmail = String(
-    currentUser?.email || ""
-  )
-    .trim()
-    .toLowerCase();
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem("travelgoNotifications");
 
-  const userNotifications = useMemo(() => {
-    if (!currentUserEmail) {
+      if (!saved) {
+        return [];
+      }
+
+      const parsed = JSON.parse(saved);
+
+      if (!Array.isArray(parsed) || !currentUser?.email) {
+        return [];
+      }
+
+      const userEmail = String(currentUser.email || "")
+        .trim()
+        .toLowerCase();
+
+      return parsed.filter((notification) => {
+        const notificationEmail = String(notification.email || "")
+          .trim()
+          .toLowerCase();
+
+        return !notificationEmail || notificationEmail === userEmail;
+      });
+    } catch (error) {
+      console.error("Không thể đọc thông báo:", error);
       return [];
     }
-
-    return notifications.filter(
-      (notification) =>
-        String(notification.email || "")
-          .trim()
-          .toLowerCase() === currentUserEmail
-    );
-  }, [notifications, currentUserEmail]);
+  });
 
   const [filter, setFilter] = useState("all");
 
-  const unreadCount = userNotifications.filter(
+  const unreadCount = notifications.filter(
     (notification) => !notification.read
   ).length;
 
   const filteredNotifications = useMemo(() => {
     if (filter === "unread") {
-      return userNotifications.filter(
+      return notifications.filter(
         (notification) => !notification.read
       );
     }
 
     if (filter === "read") {
-      return userNotifications.filter(
+      return notifications.filter(
         (notification) => notification.read
       );
     }
 
-    return userNotifications;
-  }, [userNotifications, filter]);
+    return notifications;
+  }, [notifications, filter]);
 
   const saveNotifications = (updatedNotifications) => {
     setNotifications(updatedNotifications);
 
-    localStorage.setItem(
-      "travelgoNotifications",
-      JSON.stringify(updatedNotifications)
-    );
+    try {
+      const saved = localStorage.getItem("travelgoNotifications");
+      const allNotifications = saved ? JSON.parse(saved) : [];
+
+      if (!Array.isArray(allNotifications) || !currentUser?.email) {
+        return;
+      }
+
+      const userEmail = String(currentUser.email)
+        .trim()
+        .toLowerCase();
+
+      const otherNotifications = allNotifications.filter((notification) => {
+        const notificationEmail = String(notification.email || "")
+          .trim()
+          .toLowerCase();
+
+        return notificationEmail && notificationEmail !== userEmail;
+      });
+
+      const globalNotifications = allNotifications.filter(
+        (notification) => !String(notification.email || "").trim()
+      );
+
+      const currentUserNotifications = updatedNotifications.filter(
+        (notification) =>
+          String(notification.email || "")
+            .trim()
+            .toLowerCase() === userEmail
+      );
+
+      const mergedNotifications = [
+        ...currentUserNotifications,
+        ...globalNotifications,
+        ...otherNotifications,
+      ];
+
+      localStorage.setItem(
+        "travelgoNotifications",
+        JSON.stringify(mergedNotifications)
+      );
+    } catch (error) {
+      console.error("Không thể lưu thông báo:", error);
+    }
   };
 
   const markAsRead = (id) => {
@@ -114,15 +143,10 @@ function Notifications() {
 
   const markAllAsRead = () => {
     const updatedNotifications = notifications.map(
-      (notification) =>
-        String(notification.email || "")
-          .trim()
-          .toLowerCase() === currentUserEmail
-          ? {
-              ...notification,
-              read: true,
-            }
-          : notification
+      (notification) => ({
+        ...notification,
+        read: true,
+      })
     );
 
     saveNotifications(updatedNotifications);
@@ -145,14 +169,7 @@ function Notifications() {
       return;
     }
 
-    const updatedNotifications = notifications.filter(
-      (notification) =>
-        String(notification.email || "")
-          .trim()
-          .toLowerCase() !== currentUserEmail
-    );
-
-    saveNotifications(updatedNotifications);
+    saveNotifications([]);
   };
 
   const getNotificationIcon = (notification) => {
@@ -241,7 +258,7 @@ function Notifications() {
               </p>
 
               <p className="mt-1 text-2xl font-bold text-gray-900">
-                {userNotifications.length}
+                {notifications.length}
               </p>
 
               <p className="mt-1 text-sm text-red-500">
@@ -263,7 +280,7 @@ function Notifications() {
               <button
                 type="button"
                 onClick={clearAllNotifications}
-                disabled={userNotifications.length === 0}
+                disabled={notifications.length === 0}
                 className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Trash2 size={17} />
@@ -389,14 +406,31 @@ function Notifications() {
                           type="button"
                           onClick={() =>
                             navigate(
+                              `/my-bookings?ticketCode=${encodeURIComponent(
+                                notification.ticketCode
+                              )}`
+                            )
+                          }
+                          className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100"
+                        >
+                          <Ticket size={16} />
+                          Xem vé
+                        </button>
+                      )}
+
+                      {notification.ticketCode && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
                               `/flight-review?ticketCode=${encodeURIComponent(
                                 notification.ticketCode
                               )}`
                             )
                           }
-                          className="rounded-lg bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100"
+                          className="rounded-lg bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-700 hover:bg-yellow-100"
                         >
-                          Xem vé
+                          Đánh giá
                         </button>
                       )}
 

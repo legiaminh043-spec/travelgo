@@ -53,6 +53,13 @@ function RequireLogin() {
     return <Navigate to="/login" replace />;
   }
 
+  try {
+    JSON.parse(savedUser);
+  } catch (error) {
+    localStorage.removeItem("travelgoUser");
+    return <Navigate to="/login" replace />;
+  }
+
   return <Outlet />;
 }
 

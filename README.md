@@ -1,16 +1,67 @@
-# React + Vite
+# TravelGo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+TravelGo là ứng dụng frontend mô phỏng nền tảng đặt vé máy bay trực tuyến.
+Hệ thống hỗ trợ tìm kiếm chuyến bay, đặt vé, chọn ghế, thanh toán mô phỏng,
+quản lý vé, thông báo, đánh giá, hồ sơ người dùng và khu vực quản trị.
 
-Currently, two official plugins are available:
+## Công nghệ sử dụng
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Công nghệ | Vai trò |
+|---|---|
+| React 19 | Xây dựng giao diện và các component |
+| Vite 8 | Công cụ phát triển, build và HMR |
+| Tailwind CSS 4 | Thiết kế giao diện và responsive |
+| React Router DOM 7 | Định tuyến giữa các trang |
+| lucide-react | Cung cấp hệ thống icon cho giao diện |
+| JavaScript / JSX | Ngôn ngữ triển khai frontend |
+| localStorage | Lưu trữ dữ liệu mô phỏng phía trình duyệt |
+| Git / GitHub | Quản lý phiên bản mã nguồn |
 
-## React Compiler
+## Các chức năng chính
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Người dùng
 
-## Expanding the Oxlint configuration
+- Đăng ký và đăng nhập
+- Tìm kiếm chuyến bay
+- Lọc và sắp xếp chuyến bay
+- Xem chi tiết chuyến bay
+- Chọn ghế
+- Đặt vé
+- Thanh toán mô phỏng
+- Áp dụng mã khuyến mại
+- Xem và quản lý vé
+- Hủy vé
+- Xem thông báo
+- Đánh giá chuyến bay
+- Xem hướng dẫn bản đồ
+- Cập nhật hồ sơ
+- Đổi mật khẩu
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### Quản trị viên
+
+- Dashboard
+- Quản lý chuyến bay
+- Quản lý ghế
+- Quản lý booking
+- Quản lý người dùng
+- Quản lý khuyến mại
+- Quản lý đánh giá
+- Thống kê doanh thu
+- Quản lý thông báo
+
+## Kiến trúc frontend
+
+Project được xây dựng theo mô hình SPA frontend.
+
+```text
+src/
+├── assets/
+├── components/
+├── context/
+├── pages/
+│   ├── Auth/
+│   └── Admin/
+├── App.jsx
+├── main.jsx
+├── App.css
+└── index.css

@@ -225,6 +225,39 @@ function Payment() {
           0
       );
 
+      const savedBookings = localStorage.getItem(
+        "travelgoBookings"
+      );
+
+      if (savedBookings) {
+        try {
+          const bookings = JSON.parse(savedBookings);
+
+          if (Array.isArray(bookings)) {
+            const seatAlreadyBooked = bookings.some(
+              (booking) =>
+                String(booking.flightId || "") ===
+                  String(flightId) &&
+                String(booking.seat || "") ===
+                  String(seat) &&
+                booking.status !== "Đã hủy"
+            );
+
+            if (seatAlreadyBooked) {
+              alert(
+                "Ghế này đã được đặt. Vui lòng quay lại chọn ghế khác."
+              );
+              return;
+            }
+          }
+        } catch (error) {
+          console.error(
+            "Lỗi kiểm tra ghế đã đặt:",
+            error
+          );
+        }
+      }
+
       if (currentAvailableSeats <= 0) {
         alert("Chuyến bay đã hết ghế!");
         return;

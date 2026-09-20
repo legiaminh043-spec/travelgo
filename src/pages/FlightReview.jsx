@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -24,16 +23,6 @@ function FlightReview() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  const currentUser = (() => {
-    try {
-      const savedUser = localStorage.getItem("travelgoUser");
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch (error) {
-      console.error("Không thể đọc tài khoản hiện tại:", error);
-      return null;
-    }
-  })();
-
   useEffect(() => {
     try {
       const savedBookings = localStorage.getItem("travelgoBookings");
@@ -50,9 +39,34 @@ function FlightReview() {
         return;
       }
 
-      const foundBooking = parsedBookings.find(
-        (item) => item.ticketCode === ticketCode
-      );
+      const savedUser = localStorage.getItem("travelgoUser");
+      const currentUser = savedUser ? JSON.parse(savedUser) : null;
+
+      let foundBooking = null;
+
+      if (ticketCode) {
+        foundBooking = parsedBookings.find(
+          (item) => item.ticketCode === ticketCode
+        );
+      } else {
+        const paidBookings = parsedBookings.filter(
+          (item) => item.status === "Đã thanh toán"
+        );
+
+        if (currentUser?.email) {
+          const userPaidBookings = paidBookings.filter(
+            (item) => item.email === currentUser.email
+          );
+
+          if (userPaidBookings.length > 0) {
+            foundBooking = userPaidBookings[0];
+          }
+        }
+
+        if (!foundBooking && paidBookings.length > 0) {
+          foundBooking = paidBookings[0];
+        }
+      }
 
       if (!foundBooking) {
         setError("Không tìm thấy vé cần đánh giá.");
@@ -66,35 +80,17 @@ function FlightReview() {
         return;
       }
 
-      if (!currentUser?.email) {
-        setError("Vui lòng đăng nhập để đánh giá vé.");
-        return;
-      }
-
-      const bookingEmail = String(foundBooking.email || "")
-        .trim()
-        .toLowerCase();
-      const userEmail = String(currentUser.email || "")
-        .trim()
-        .toLowerCase();
-
-      if (!bookingEmail || bookingEmail !== userEmail) {
-        setError("Bạn không có quyền đánh giá vé này.");
-        return;
-      }
-
       setBooking(foundBooking);
+      setError("");
 
-      const savedReviews = localStorage.getItem(
-        "travelgoReviews"
-      );
+      const savedReviews = localStorage.getItem("travelgoReviews");
 
       if (savedReviews) {
         const reviews = JSON.parse(savedReviews);
 
         if (Array.isArray(reviews)) {
           const existingReview = reviews.find(
-            (review) => review.ticketCode === ticketCode
+            (review) => review.ticketCode === foundBooking.ticketCode
           );
 
           if (existingReview) {
@@ -108,7 +104,7 @@ function FlightReview() {
       console.error("Không thể đọc dữ liệu đánh giá:", err);
       setError("Không thể tải thông tin đánh giá.");
     }
-  }, [ticketCode, currentUser?.email]);
+  }, [ticketCode]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -128,9 +124,7 @@ function FlightReview() {
     }
 
     try {
-      const savedReviews = localStorage.getItem(
-        "travelgoReviews"
-      );
+      const savedReviews = localStorage.getItem("travelgoReviews");
 
       const reviews = savedReviews
         ? JSON.parse(savedReviews)
@@ -190,9 +184,7 @@ function FlightReview() {
             Không thể đánh giá
           </h1>
 
-          <p className="mt-3 text-gray-500">
-            {error}
-          </p>
+          <p className="mt-3 text-gray-500">{error}</p>
 
           <button
             type="button"
@@ -266,9 +258,7 @@ function FlightReview() {
               </div>
 
               <div className="text-left md:text-right">
-                <p className="text-sm text-gray-500">
-                  Mã vé
-                </p>
+                <p className="text-sm text-gray-500">Mã vé</p>
 
                 <p className="font-bold text-gray-900">
                   {booking.ticketCode}
@@ -278,27 +268,24 @@ function FlightReview() {
 
             <div className="mt-5 grid gap-4 border-t border-blue-100 pt-5 md:grid-cols-3">
               <div>
-                <p className="text-sm text-gray-500">
-                  Ngày bay
-                </p>
+                <p className="text-sm text-gray-500">Ngày bay</p>
+
                 <p className="mt-1 font-semibold text-gray-900">
                   {booking.date || "Chưa cập nhật"}
                 </p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
-                  Hành khách
-                </p>
+                <p className="text-sm text-gray-500">Hành khách</p>
+
                 <p className="mt-1 font-semibold text-gray-900">
                   {booking.fullName || "Khách hàng"}
                 </p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
-                  Trạng thái
-                </p>
+                <p className="text-sm text-gray-500">Trạng thái</p>
+
                 <p className="mt-1 font-semibold text-green-600">
                   {booking.status}
                 </p>
@@ -334,9 +321,7 @@ function FlightReview() {
                 ))}
               </div>
 
-              <p className="mt-4 text-gray-600">
-                {comment}
-              </p>
+              <p className="mt-4 text-gray-600">{comment}</p>
 
               <button
                 type="button"
@@ -347,13 +332,11 @@ function FlightReview() {
               </button>
             </div>
           ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="mt-8"
-            >
+            <form onSubmit={handleSubmit} className="mt-8">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-2">
                   <Star className="text-yellow-500" />
+
                   <h2 className="text-xl font-bold">
                     Bạn đánh giá chuyến bay này thế nào?
                   </h2>
@@ -368,12 +351,8 @@ function FlightReview() {
                     <button
                       key={star}
                       type="button"
-                      onMouseEnter={() =>
-                        setHoverRating(star)
-                      }
-                      onMouseLeave={() =>
-                        setHoverRating(0)
-                      }
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
                       onClick={() => {
                         setRating(star);
                         setError("");
@@ -383,8 +362,7 @@ function FlightReview() {
                       <Star
                         size={40}
                         className={
-                          star <=
-                          (hoverRating || rating)
+                          star <= (hoverRating || rating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-300"
                         }
@@ -408,8 +386,8 @@ function FlightReview() {
 
                 <textarea
                   value={comment}
-                  onChange={(e) => {
-                    setComment(e.target.value);
+                  onChange={(event) => {
+                    setComment(event.target.value);
                     setError("");
                   }}
                   rows={6}
@@ -449,4 +427,3 @@ function FlightReview() {
 }
 
 export default FlightReview;
-

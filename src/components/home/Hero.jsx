@@ -25,12 +25,6 @@ const defaultFlights = [
   },
 ];
 
-const quickRoutes = [
-  { from: "Hà Nội", to: "TP. Hồ Chí Minh" },
-  { from: "Hà Nội", to: "Đà Nẵng" },
-  { from: "TP. Hồ Chí Minh", to: "Hà Nội" },
-];
-
 function Hero() {
   const navigate = useNavigate();
 
@@ -77,11 +71,6 @@ function Hero() {
     setTo("");
   };
 
-  const handleQuickRoute = (route) => {
-    setFrom(route.from);
-    setTo(route.to);
-  };
-
   const handleSearch = () => {
     if (!from || !to || !date) {
       alert("Vui lòng chọn điểm đi, điểm đến và ngày đi!");
@@ -102,16 +91,15 @@ function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-10 text-center text-white">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-50 shadow-sm backdrop-blur-sm">
-            <span className="h-2 w-2 rounded-full bg-cyan-200" />
-            TravelGo · Hành trình của bạn bắt đầu từ đây
-          </div>
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-cyan-100">
+            TravelGo
+          </p>
 
           <h1 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
             Đặt vé máy bay dễ dàng
           </h1>
 
-          <p className="mx-auto max-w-2xl text-base leading-7 text-blue-100 md:text-lg">
+          <p className="mx-auto max-w-2xl text-base text-blue-100 md:text-lg">
             Tìm kiếm chuyến bay nhanh chóng, an toàn và tiện lợi
             cho hành trình của bạn.
           </p>
@@ -226,30 +214,6 @@ function Hero() {
                 <Search size={20} />
                 Tìm chuyến bay
               </button>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                Gợi ý nhanh
-              </p>
-              <p className="mt-1 text-sm text-gray-500">
-                Chọn tuyến phổ biến để điền nhanh điểm đi và điểm đến
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {quickRoutes.map((route) => (
-                <button
-                  key={`${route.from}-${route.to}`}
-                  type="button"
-                  onClick={() => handleQuickRoute(route)}
-                  className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
-                >
-                  {route.from} → {route.to}
-                </button>
-              ))}
             </div>
           </div>
         </div>

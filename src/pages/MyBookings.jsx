@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Plane,
@@ -93,6 +93,44 @@ function MyBookings() {
       return null;
     }
   })();
+    useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key !== "travelgoBookings") {
+        return;
+      }
+
+      try {
+        const nextBookings = event.newValue
+          ? JSON.parse(event.newValue)
+          : [];
+
+        setBookings(
+          Array.isArray(nextBookings)
+            ? nextBookings
+            : []
+        );
+      } catch (error) {
+        console.error(
+          "Không thể đồng bộ danh sách vé:",
+          error
+        );
+
+        setBookings([]);
+      }
+    };
+
+    window.addEventListener(
+      "storage",
+      handleStorageChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "storage",
+        handleStorageChange
+      );
+    };
+  }, []);
 
   const userBookings = useMemo(() => {
     if (!currentUser?.email) {

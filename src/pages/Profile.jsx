@@ -16,20 +16,12 @@ import {
 function Profile() {
   const navigate = useNavigate();
 
-  const normalizedPhone = phone.replace(/\s+/g, "");
-
-if (
-  normalizedPhone &&
-  !/^(0\d{9}|\+84\d{9,10})$/.test(normalizedPhone)
-) {
-  showMessage("Số điện thoại không hợp lệ.", "error");
-  return;
-}
-
   const [user, setUser] = useState(null);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
   const [avatar, setAvatar] = useState("");
 
   const [oldPassword, setOldPassword] = useState("");
@@ -65,6 +57,7 @@ if (
         "Không thể đọc thông tin tài khoản:",
         error
       );
+
       navigate("/login");
     }
   }, [navigate]);
@@ -114,58 +107,26 @@ if (
       return;
     }
 
-    // Commit 9: kiểm tra định dạng số điện thoại
-    const normalizedPhone = phone.replace(/\s+/g, "");
-
-    if (
-      normalizedPhone &&
-      !/^(0\d{9}|\+84\d{9,10})$/.test(normalizedPhone)
-    ) {
-      showMessage("Số điện thoại không hợp lệ.", "error");
-      return;
-    }
-
-    // Kiểm tra email có bị trùng hay không
     try {
-      const savedUsers = localStorage.getItem(
-        "travelgoUsers"
+      const savedUsers = localStorage.getItem("travelgoUsers");
+      const users = savedUsers ? JSON.parse(savedUsers) : [];
+      const normalizedEmail = email.trim().toLowerCase();
+
+      const emailExists = Array.isArray(users) && users.some(
+        (item) =>
+          item.id !== user.id &&
+          String(item.email || "").trim().toLowerCase() === normalizedEmail
       );
 
-      const users = savedUsers
-        ? JSON.parse(savedUsers)
-        : [];
-
-      const normalizedEmail = email
-        .trim()
-        .toLowerCase();
-
-      const emailExists =
-        Array.isArray(users) &&
-        users.some(
-          (item) =>
-            item.id !== user.id &&
-            String(item.email || "")
-              .trim()
-              .toLowerCase() === normalizedEmail
-        );
-
       if (emailExists) {
-        showMessage(
-          "Email này đã được sử dụng bởi tài khoản khác.",
-          "error"
-        );
+        showMessage("Email này đã được sử dụng bởi tài khoản khác.", "error");
         return;
       }
     } catch (error) {
-      console.error(
-        "Không thể kiểm tra email tài khoản:",
-        error
-      );
+      console.error("Không thể kiểm tra email tài khoản:", error);
     }
 
-    const oldEmail = String(user.email || "")
-      .trim()
-      .toLowerCase();
+    const oldEmail = String(user.email || "").trim().toLowerCase();
 
     const updatedUser = {
       ...user,
@@ -180,15 +141,9 @@ if (
       JSON.stringify(updatedUser)
     );
 
-    // Đồng bộ thông tin vào danh sách users
     try {
-      const savedUsers = localStorage.getItem(
-        "travelgoUsers"
-      );
-
-      const users = savedUsers
-        ? JSON.parse(savedUsers)
-        : [];
+      const savedUsers = localStorage.getItem("travelgoUsers");
+      const users = savedUsers ? JSON.parse(savedUsers) : [];
 
       if (Array.isArray(users)) {
         const updatedUsers = users.map((item) =>
@@ -203,38 +158,19 @@ if (
         );
       }
     } catch (error) {
-      console.error(
-        "Không thể đồng bộ danh sách tài khoản:",
-        error
-      );
+      console.error("Không thể đồng bộ danh sách tài khoản:", error);
     }
 
-    // Nếu đổi email thì cập nhật email trong booking
-    if (
-      oldEmail &&
-      oldEmail !==
-        updatedUser.email.trim().toLowerCase()
-    ) {
+    if (oldEmail && oldEmail !== updatedUser.email.trim().toLowerCase()) {
       try {
-        const savedBookings = localStorage.getItem(
-          "travelgoBookings"
-        );
-
-        const bookings = savedBookings
-          ? JSON.parse(savedBookings)
-          : [];
+        const savedBookings = localStorage.getItem("travelgoBookings");
+        const bookings = savedBookings ? JSON.parse(savedBookings) : [];
 
         if (Array.isArray(bookings)) {
-          const updatedBookings = bookings.map(
-            (booking) =>
-              String(booking.email || "")
-                .trim()
-                .toLowerCase() === oldEmail
-                ? {
-                    ...booking,
-                    email: updatedUser.email.trim(),
-                  }
-                : booking
+          const updatedBookings = bookings.map((booking) =>
+            String(booking.email || "").trim().toLowerCase() === oldEmail
+              ? { ...booking, email: updatedUser.email.trim() }
+              : booking
           );
 
           localStorage.setItem(
@@ -243,36 +179,23 @@ if (
           );
         }
       } catch (error) {
-        console.error(
-          "Không thể cập nhật email trong danh sách vé:",
-          error
-        );
+        console.error("Không thể cập nhật email trong danh sách vé:", error);
       }
 
-      // Nếu đổi email thì cập nhật email trong thông báo
       try {
-        const savedNotifications =
-          localStorage.getItem(
-            "travelgoNotifications"
-          );
-
+        const savedNotifications = localStorage.getItem(
+          "travelgoNotifications"
+        );
         const notifications = savedNotifications
           ? JSON.parse(savedNotifications)
           : [];
 
         if (Array.isArray(notifications)) {
-          const updatedNotifications =
-            notifications.map(
-              (notification) =>
-                String(notification.email || "")
-                  .trim()
-                  .toLowerCase() === oldEmail
-                  ? {
-                      ...notification,
-                      email: updatedUser.email.trim(),
-                    }
-                  : notification
-            );
+          const updatedNotifications = notifications.map((notification) =>
+            String(notification.email || "").trim().toLowerCase() === oldEmail
+              ? { ...notification, email: updatedUser.email.trim() }
+              : notification
+          );
 
           localStorage.setItem(
             "travelgoNotifications",
@@ -289,28 +212,19 @@ if (
 
     setUser(updatedUser);
 
-    showMessage(
-      "Cập nhật thông tin thành công!",
-      "success"
-    );
+    showMessage("Cập nhật thông tin thành công!", "success");
   };
 
   const handleChangePassword = (event) => {
     event.preventDefault();
 
     if (!oldPassword) {
-      showMessage(
-        "Vui lòng nhập mật khẩu hiện tại.",
-        "error"
-      );
+      showMessage("Vui lòng nhập mật khẩu hiện tại.", "error");
       return;
     }
 
     if (!newPassword) {
-      showMessage(
-        "Vui lòng nhập mật khẩu mới.",
-        "error"
-      );
+      showMessage("Vui lòng nhập mật khẩu mới.", "error");
       return;
     }
 
@@ -330,9 +244,7 @@ if (
       return;
     }
 
-    if (
-      String(user.password || "") !== oldPassword
-    ) {
+    if (String(user.password || "") !== oldPassword) {
       showMessage(
         "Mật khẩu hiện tại không đúng.",
         "error"
@@ -350,23 +262,14 @@ if (
       JSON.stringify(updatedUser)
     );
 
-    // Đồng bộ mật khẩu vào danh sách users
     try {
-      const savedUsers = localStorage.getItem(
-        "travelgoUsers"
-      );
-
-      const users = savedUsers
-        ? JSON.parse(savedUsers)
-        : [];
+      const savedUsers = localStorage.getItem("travelgoUsers");
+      const users = savedUsers ? JSON.parse(savedUsers) : [];
 
       if (Array.isArray(users)) {
         const updatedUsers = users.map((item) =>
           item.id === user.id
-            ? {
-                ...item,
-                password: newPassword,
-              }
+            ? { ...item, password: newPassword }
             : item
         );
 
@@ -376,13 +279,11 @@ if (
         );
       }
     } catch (error) {
-      console.error(
-        "Không thể đồng bộ mật khẩu tài khoản:",
-        error
-      );
+      console.error("Không thể đồng bộ mật khẩu tài khoản:", error);
     }
 
     setUser(updatedUser);
+
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
@@ -416,7 +317,6 @@ if (
         </button>
 
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          {/* Header */}
           <div className="bg-blue-600 px-8 py-10 text-white">
             <div className="flex flex-col items-center gap-5 sm:flex-row">
               <div className="relative">
@@ -456,7 +356,6 @@ if (
             </div>
           </div>
 
-          {/* Message */}
           {message && (
             <div
               className={`mx-8 mt-6 rounded-xl px-4 py-3 text-sm font-semibold ${
@@ -470,7 +369,6 @@ if (
           )}
 
           <div className="grid gap-8 p-8 lg:grid-cols-2">
-            {/* Account information */}
             <div>
               <h2 className="text-xl font-bold text-gray-900">
                 Thông tin tài khoản
@@ -480,7 +378,6 @@ if (
                 onSubmit={handleSaveInfo}
                 className="mt-6 space-y-5"
               >
-                {/* Full name */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Họ và tên
@@ -505,7 +402,6 @@ if (
                   </div>
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Email
@@ -530,7 +426,6 @@ if (
                   </div>
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Số điện thoại
@@ -555,7 +450,6 @@ if (
                   </div>
                 </div>
 
-                {/* Role */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Vai trò
@@ -585,7 +479,6 @@ if (
               </form>
             </div>
 
-            {/* Change password */}
             <div>
               <h2 className="text-xl font-bold text-gray-900">
                 Đổi mật khẩu
@@ -595,7 +488,6 @@ if (
                 onSubmit={handleChangePassword}
                 className="mt-6 space-y-5"
               >
-                {/* Old password */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Mật khẩu hiện tại
@@ -639,7 +531,6 @@ if (
                   </div>
                 </div>
 
-                {/* New password */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Mật khẩu mới
@@ -683,7 +574,6 @@ if (
                   </div>
                 </div>
 
-                {/* Confirm password */}
                 <div>
                   <label className="mb-2 block font-semibold text-gray-700">
                     Xác nhận mật khẩu mới

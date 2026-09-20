@@ -81,6 +81,32 @@ Các chức năng chính gồm:
 
 ## 5. Chạy dự án
 
+## Phạm vi thực hiện
+
+TravelGo tập trung xây dựng frontend React cho website đặt vé máy bay.
+Các chức năng chính gồm:
+
+- Đăng ký và đăng nhập tài khoản.
+- Tìm kiếm, lọc và sắp xếp chuyến bay.
+- Xem chi tiết chuyến bay.
+- Chọn ghế và đặt vé.
+- Thanh toán mô phỏng.
+- Quản lý vé đã đặt.
+- Quản lý thông báo.
+- Đánh giá chuyến bay.
+- Quản lý thông tin cá nhân.
+- Khu vực quản trị Admin.
+
+## Giới hạn của đề tài
+
+- Chưa triển khai backend và cơ sở dữ liệu tập trung.
+- Dữ liệu được lưu trữ bằng Local Storage của trình duyệt.
+- Thanh toán hiện tại chỉ là mô phỏng, chưa kết nối cổng thanh toán thật.
+- Xác thực và phân quyền mới được xử lý ở phía frontend.
+- Bản đồ chỉ mô phỏng và hỗ trợ mở Google Maps.
+- Chưa có cơ chế đồng bộ dữ liệu giữa nhiều thiết bị.
+- Một số chức năng Admin phục vụ mục đích demo và kiểm thử.
+
 ```bash
 npm install
 npm run dev

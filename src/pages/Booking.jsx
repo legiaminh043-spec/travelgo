@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   User,
@@ -20,61 +20,8 @@ function Booking() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [selectedSeat, setSelectedSeat] = useState("");
-  useEffect(() => {
-  try {
-    const savedUser = localStorage.getItem("travelgoUser");
-
-    if (!savedUser) {
-      return;
-    }
-
-    const currentUser = JSON.parse(savedUser);
-
-    setFullName(currentUser.fullName || "");
-    setPhone(currentUser.phone || "");
-    setEmail(currentUser.email || "");
-  } catch (error) {
-    console.error("Không thể đọc thông tin tài khoản:", error);
-  }
-}, []);
-
-
 
   const searchParams = new URLSearchParams(location.search);
-  const flightId = searchParams.get("flightId") || "";
-const airline = searchParams.get("airline") || "Chuyến bay";
-const from = searchParams.get("from") || "Chưa chọn";
-const to = searchParams.get("to") || "Chưa chọn";
-const date = searchParams.get("date") || "Chưa chọn";
-const price = searchParams.get("price") || "0";
-
-const occupiedSeats = (() => {
-  try {
-    const savedBookings = localStorage.getItem("travelgoBookings");
-
-    if (!savedBookings) {
-      return [];
-    }
-
-    const bookings = JSON.parse(savedBookings);
-
-    if (!Array.isArray(bookings)) {
-      return [];
-    }
-
-    return bookings
-      .filter(
-        (booking) =>
-          String(booking.flightId || "") === String(flightId) &&
-          booking.status !== "Đã hủy" &&
-          booking.seat
-      )
-      .map((booking) => String(booking.seat));
-  } catch (error) {
-    console.error("Lỗi đọc ghế đã đặt:", error);
-    return [];
-  }
-})();
 
   const flightId = searchParams.get("flightId") || "";
   const airline = searchParams.get("airline") || "Chuyến bay";
@@ -82,6 +29,27 @@ const occupiedSeats = (() => {
   const to = searchParams.get("to") || "Chưa chọn";
   const date = searchParams.get("date") || "Chưa chọn";
   const price = searchParams.get("price") || "0";
+
+  const occupiedSeats = (() => {
+    try {
+      const savedBookings = localStorage.getItem("travelgoBookings");
+      if (!savedBookings) return [];
+
+      const bookings = JSON.parse(savedBookings);
+      if (!Array.isArray(bookings)) return [];
+
+      return bookings
+        .filter((booking) =>
+          String(booking.flightId || "") === String(flightId) &&
+          booking.status !== "Đã hủy" &&
+          booking.seat
+        )
+        .map((booking) => String(booking.seat));
+    } catch (error) {
+      console.error("Lỗi đọc ghế đã đặt:", error);
+      return [];
+    }
+  })();
 
   const seats = [
     "A1",

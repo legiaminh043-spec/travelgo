@@ -18,7 +18,8 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState("Tất cả");
   const [selectedUser, setSelectedUser] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
+  try {
     const savedUsers = JSON.parse(
       localStorage.getItem("travelgoUsers") || "[]"
     );
@@ -27,14 +28,23 @@ function AdminUsers() {
       localStorage.getItem("travelgoUser") || "null"
     );
 
-    let userList = savedUsers;
+    let userList = Array.isArray(savedUsers)
+      ? savedUsers
+      : [];
 
     if (userList.length === 0 && currentUser) {
       userList = [currentUser];
     }
 
     setUsers(userList);
-  }, []);
+  } catch (error) {
+    console.error(
+      "Không thể tải danh sách người dùng:",
+      error
+    );
+    setUsers([]);
+  }
+}, []);
 
   const filteredUsers = users.filter((user) => {
     const keyword = search.toLowerCase().trim();

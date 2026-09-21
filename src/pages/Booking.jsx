@@ -16,25 +16,9 @@ function Booking() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const currentUser = (() => {
-    try {
-      const savedUser = localStorage.getItem("travelgoUser");
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch (error) {
-      console.error("Không thể đọc tài khoản hiện tại:", error);
-      return null;
-    }
-  })();
-
-  const [fullName, setFullName] = useState(
-    currentUser?.fullName || ""
-  );
-  const [phone, setPhone] = useState(
-    currentUser?.phone || ""
-  );
-  const [email, setEmail] = useState(
-    currentUser?.email || ""
-  );
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [selectedSeat, setSelectedSeat] = useState("");
 
   const searchParams = new URLSearchParams(location.search);

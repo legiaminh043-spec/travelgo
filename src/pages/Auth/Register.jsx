@@ -1,19 +1,26 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Phone } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = (e) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !password ||
+      !confirmPassword
+    ) {
       alert("Vui lòng nhập đầy đủ thông tin!");
       return;
     }
@@ -23,12 +30,25 @@ export default function Register() {
       return;
     }
 
-    const users = JSON.parse(
-      localStorage.getItem("travelgoUsers") || "[]"
-    );
+    let users = [];
+
+    try {
+      users = JSON.parse(
+        localStorage.getItem("travelgoUsers") || "[]"
+      );
+
+      if (!Array.isArray(users)) {
+        users = [];
+      }
+    } catch (error) {
+      console.error("Không thể đọc danh sách người dùng:", error);
+      users = [];
+    }
 
     const existingUser = users.find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
+      (user) =>
+        String(user.email || "").toLowerCase() ===
+        email.toLowerCase()
     );
 
     if (existingUser) {
@@ -40,6 +60,7 @@ export default function Register() {
       id: Date.now(),
       fullName,
       email,
+      phone,
       password,
       role: "user",
     };
@@ -57,7 +78,6 @@ export default function Register() {
     );
 
     alert("Đăng ký tài khoản thành công!");
-
     navigate("/login");
   };
 
@@ -74,7 +94,11 @@ export default function Register() {
           </p>
         </div>
 
-        <form onSubmit={handleRegister} className="space-y-4">
+        <form
+          onSubmit={handleRegister}
+          className="space-y-4"
+        >
+          {/* Họ và tên */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Họ và tên
@@ -89,13 +113,16 @@ export default function Register() {
               <input
                 type="text"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) =>
+                  setFullName(e.target.value)
+                }
                 placeholder="Nhập họ và tên"
                 className="w-full border rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Email
@@ -110,13 +137,40 @@ export default function Register() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
                 placeholder="Nhập email"
                 className="w-full border rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
+          {/* Số điện thoại */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Số điện thoại
+            </label>
+
+            <div className="relative">
+              <Phone
+                size={20}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(e.target.value)
+                }
+                placeholder="Nhập số điện thoại"
+                className="w-full border rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Mật khẩu */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Mật khẩu
@@ -131,13 +185,16 @@ export default function Register() {
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
                 placeholder="Nhập mật khẩu"
                 className="w-full border rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
+          {/* Xác nhận mật khẩu */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Xác nhận mật khẩu
@@ -152,13 +209,16 @@ export default function Register() {
               <input
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) =>
+                  setConfirmPassword(e.target.value)
+                }
                 placeholder="Nhập lại mật khẩu"
                 className="w-full border rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
+          {/* Đăng ký */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
@@ -169,6 +229,7 @@ export default function Register() {
 
         <p className="text-center text-gray-500 mt-6">
           Đã có tài khoản?{" "}
+
           <Link
             to="/login"
             className="text-blue-600 font-semibold hover:underline"

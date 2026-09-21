@@ -1,112 +1,67 @@
 # TravelGo
 
-## 1. Giới thiệu đề tài
+TravelGo là ứng dụng frontend mô phỏng nền tảng đặt vé máy bay trực tuyến.
+Hệ thống hỗ trợ tìm kiếm chuyến bay, đặt vé, chọn ghế, thanh toán mô phỏng,
+quản lý vé, thông báo, đánh giá, hồ sơ người dùng và khu vực quản trị.
 
-TravelGo là website đặt vé máy bay được xây dựng bằng React và Vite,
-hướng đến việc mô phỏng quy trình tìm kiếm chuyến bay, đặt vé, chọn ghế,
-thanh toán và quản lý vé trên giao diện web.
+## Công nghệ sử dụng
 
-Ứng dụng sử dụng Local Storage để lưu trữ dữ liệu trong phạm vi prototype,
-không sử dụng backend và cơ sở dữ liệu tập trung.
+| Công nghệ | Vai trò |
+|---|---|
+| React 19 | Xây dựng giao diện và các component |
+| Vite 8 | Công cụ phát triển, build và HMR |
+| Tailwind CSS 4 | Thiết kế giao diện và responsive |
+| React Router DOM 7 | Định tuyến giữa các trang |
+| lucide-react | Cung cấp hệ thống icon cho giao diện |
+| JavaScript / JSX | Ngôn ngữ triển khai frontend |
+| localStorage | Lưu trữ dữ liệu mô phỏng phía trình duyệt |
+| Git / GitHub | Quản lý phiên bản mã nguồn |
 
-## 2. Mục tiêu đề tài
+## Các chức năng chính
 
-### 2.1. Mục tiêu sản phẩm
+### Người dùng
 
-- Xây dựng giao diện website đặt vé máy bay trực tuyến.
-- Cho phép người dùng tìm kiếm và lọc chuyến bay.
-- Cho phép người dùng xem thông tin chi tiết chuyến bay và lựa chọn ghế.
-- Hỗ trợ nhập thông tin hành khách và chuyển sang bước thanh toán.
-- Mô phỏng thanh toán và tạo booking sau khi thanh toán thành công.
-- Cho phép người dùng xem, tìm kiếm, lọc và quản lý vé đã đặt.
-- Hỗ trợ xem và quản lý thông báo.
-- Cho phép người dùng đánh giá chuyến bay sau khi đã thanh toán.
-- Cung cấp trang hồ sơ để cập nhật thông tin cá nhân và mật khẩu.
+- Đăng ký và đăng nhập
+- Tìm kiếm chuyến bay
+- Lọc và sắp xếp chuyến bay
+- Xem chi tiết chuyến bay
+- Chọn ghế
+- Đặt vé
+- Thanh toán mô phỏng
+- Áp dụng mã khuyến mại
+- Xem và quản lý vé
+- Hủy vé
+- Xem thông báo
+- Đánh giá chuyến bay
+- Xem hướng dẫn bản đồ
+- Cập nhật hồ sơ
+- Đổi mật khẩu
 
-### 2.2. Mục tiêu kỹ thuật
+### Quản trị viên
 
-- Sử dụng React để xây dựng ứng dụng frontend.
-- Sử dụng React Router để tổ chức điều hướng giữa các trang.
-- Sử dụng Tailwind CSS để xây dựng giao diện responsive.
-- Sử dụng Local Storage để mô phỏng việc lưu trữ và chia sẻ dữ liệu.
-- Tổ chức mã nguồn theo component và page để dễ bảo trì.
-- Kiểm tra và xử lý các trường hợp dữ liệu Local Storage không hợp lệ.
-- Tạo trải nghiệm liền mạch giữa các bước tìm kiếm, đặt vé, thanh toán
-  và quản lý vé.
+- Dashboard
+- Quản lý chuyến bay
+- Quản lý ghế
+- Quản lý booking
+- Quản lý người dùng
+- Quản lý khuyến mại
+- Quản lý đánh giá
+- Thống kê doanh thu
+- Quản lý thông báo
 
-### 2.3. Mục tiêu quản trị
+## Kiến trúc frontend
 
-Khu vực Admin hỗ trợ mô phỏng việc quản lý dữ liệu của hệ thống,
-bao gồm:
+Project được xây dựng theo mô hình SPA frontend.
 
-- Quản lý chuyến bay.
-- Quản lý ghế.
-- Quản lý booking.
-- Quản lý người dùng.
-- Quản lý mã khuyến mại.
-- Quản lý đánh giá.
-- Theo dõi doanh thu.
-- Quản lý thông báo.
-
-## 3. Phạm vi đề tài
-
-Đề tài tập trung vào frontend React của TravelGo. Các chức năng được
-triển khai ở mức prototype và sử dụng dữ liệu cục bộ trong trình duyệt.
-
-Các chức năng chính gồm:
-
-- Trang chủ.
-- Đăng ký và đăng nhập.
-- Tìm kiếm chuyến bay.
-- Chi tiết chuyến bay.
-- Đặt vé và chọn ghế.
-- Thanh toán.
-- Vé điện tử.
-- Quản lý vé.
-- Thông báo.
-- Đánh giá chuyến bay.
-- Bản đồ chỉ đường.
-- Hồ sơ cá nhân.
-- Khu vực quản trị Admin.
-
-## 4. Công nghệ sử dụng
-
-- React
-- Vite
-- React Router
-- Tailwind CSS
-- Lucide React
-- JavaScript
-- Local Storage
-
-## 5. Chạy dự án
-
-## Phạm vi thực hiện
-
-TravelGo tập trung xây dựng frontend React cho website đặt vé máy bay.
-Các chức năng chính gồm:
-
-- Đăng ký và đăng nhập tài khoản.
-- Tìm kiếm, lọc và sắp xếp chuyến bay.
-- Xem chi tiết chuyến bay.
-- Chọn ghế và đặt vé.
-- Thanh toán mô phỏng.
-- Quản lý vé đã đặt.
-- Quản lý thông báo.
-- Đánh giá chuyến bay.
-- Quản lý thông tin cá nhân.
-- Khu vực quản trị Admin.
-
-## Giới hạn của đề tài
-
-- Chưa triển khai backend và cơ sở dữ liệu tập trung.
-- Dữ liệu được lưu trữ bằng Local Storage của trình duyệt.
-- Thanh toán hiện tại chỉ là mô phỏng, chưa kết nối cổng thanh toán thật.
-- Xác thực và phân quyền mới được xử lý ở phía frontend.
-- Bản đồ chỉ mô phỏng và hỗ trợ mở Google Maps.
-- Chưa có cơ chế đồng bộ dữ liệu giữa nhiều thiết bị.
-- Một số chức năng Admin phục vụ mục đích demo và kiểm thử.
-
-```bash
-npm install
-npm run dev
+```text
+src/
+├── assets/
+├── components/
+├── context/
+├── pages/
+│   ├── Auth/
+│   └── Admin/
+├── App.jsx
+├── main.jsx
+├── App.css
+└── index.cssgit add README.md
